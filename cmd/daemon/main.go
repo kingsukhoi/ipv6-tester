@@ -20,7 +20,7 @@ func main() {
 	if hostname == "" {
 		hostname = "localhost"
 	}
-
+	//https://<url>/api/v1/import/prometheus
 	victoriaEndpoint, exists := os.LookupEnv("VICTORIA_ENDPOINT")
 	if !exists {
 		panic("VICTORIA_ENDPOINT environment variable not set")
