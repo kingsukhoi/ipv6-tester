@@ -21,6 +21,11 @@ func main() {
 		hostname = "localhost"
 	}
 
+	victoriaEndpoint, exists := os.LookupEnv("VICTORIA_ENDPOINT")
+	if !exists {
+		panic("VICTORIA_ENDPOINT environment variable not set")
+	}
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
@@ -29,7 +34,7 @@ func main() {
 		slog.Error("runTest failed", "error", err)
 	}
 
-	err = metrics.PushMetrics(ctx, "https://metrics.farsos.ca/api/v1/import/prometheus", false,
+	err = metrics.PushMetrics(ctx, victoriaEndpoint, false,
 		&metrics.PushOptions{
 			ExtraLabels: fmt.Sprintf(`hostname="%s"`, hostname),
 		})
@@ -48,7 +53,7 @@ func main() {
 				slog.Error("runTest failed", "error", errL)
 			}
 
-			errL = metrics.PushMetrics(ctx, "https://metrics.farsos.ca/api/v1/import/prometheus", false,
+			errL = metrics.PushMetrics(ctx, victoriaEndpoint, false,
 				&metrics.PushOptions{
 					ExtraLabels: fmt.Sprintf(`hostname="%s"`, hostname),
 				})
