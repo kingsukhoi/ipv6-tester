@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -81,8 +80,8 @@ func runTest(ctx context.Context, serverToTest string) error {
 		successFloat = 0
 	}
 
-	ipv6WorkingGauge := metrics.GetOrCreateGauge(fmt.Sprintf(`ipv6_working{server="%s"}`,
-		connRes.ServerAddress), nil)
+	ipv6WorkingGauge := metrics.GetOrCreateGauge(fmt.Sprintf(`ipv6_working{server="%s", address_used="%s"}`,
+		connRes.ServerAddress, connRes.LocalAddress), nil)
 	ipv6WorkingGauge.Set(successFloat)
 
 	if err != nil && connRes.LocalAddress == "" {
@@ -106,9 +105,11 @@ func runTest(ctx context.Context, serverToTest string) error {
 
 	slog.Info("current local ipv6 addresses", "addresses", ipAddrs.Addresses, "interface", currInterface.Name)
 
-	addressGauge := metrics.GetOrCreateGauge(fmt.Sprintf(`ipv6_addresses{addresses="%s", server="%s"}`,
-		strings.Join(ipAddrs.Addresses, ","), connRes.ServerAddress), nil)
-	addressGauge.Set(float64(len(ipAddrs.Addresses)))
+	for _, ipAddr := range ipAddrs.Addresses {
+		addressGauge := metrics.GetOrCreateGauge(fmt.Sprintf(`ipv6_addresses{address="%s", interface="%s",server="%s"}`,
+			ipAddr, currInterface.Name, connRes.ServerAddress), nil)
+		addressGauge.Set(1)
+	}
 
 	return nil
 }
