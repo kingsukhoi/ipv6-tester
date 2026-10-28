@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/VictoriaMetrics/metrics v1.42.0
-	github.com/labstack/echo/v5 v5.0.4
+	github.com/labstack/echo/v5 v5.4.1
 )
 
 require (
